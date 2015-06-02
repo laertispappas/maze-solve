@@ -12,6 +12,9 @@ class Maze < ActiveRecord::Base
   validates_presence_of :stop_x
   validates_presence_of :stop_y
   validates_presence_of :wall
+  validate :accept_one_char_for_wall
+  validate :do_not_accept_asterisk
+  validate :do_not_accept_asterisk_in_maze
 
   default_scope { order("created_at DESC") }
 
@@ -23,5 +26,24 @@ class Maze < ActiveRecord::Base
   def max_height
     self.maze.split("\r\n").size
   end
+
+  def accept_one_char_for_wall
+    if self.wall.size > 1
+      errors.add(:wall, "Must be one character")
+    end
+  end
+
+  def do_not_accept_asterisk
+    if self.wall == "*"
+      errors.add(:wall, "Cannot be an asterisk")
+    end
+  end
+
+  def do_not_accept_asterisk_in_maze
+    if self.maze.include?("*")
+      errors.add(:maze, "Cannot contain an asterisk")
+    end
+  end
+
 
 end
