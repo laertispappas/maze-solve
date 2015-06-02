@@ -3,12 +3,12 @@ class MazesController < ApplicationController
   def solve
     @matrix = BfsMaze.read_text(@maze.maze)
     @maze_solver = BfsMaze::BFSSolver.new(@matrix, @maze)
-#    @maze_solver.check_for_error
+    @maze_solver.check_for_error
     @maze_solver.solve_maze
     @path = @maze_solver.path_array
-#rescue
-#    flash[:alert] = "Start or Goal cannot be a wall or outside maze!!!"
-#    redirect_to mazes_url
+rescue
+    flash[:alert] = "Start or Goal cannot be a wall or outside maze!!!"
+    redirect_to mazes_url
   end
 
   # GET /mazes
@@ -59,6 +59,10 @@ class MazesController < ApplicationController
         end
       end
     end
+
+  rescue
+    flash[:alert] = "Error creating maze check your file input format!!!"
+    redirect_to new_maze_url
   end
 
   # PATCH/PUT /mazes/1

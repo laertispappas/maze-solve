@@ -17,16 +17,15 @@ module BfsMaze
     maze = {}
     matrix = []
 
-    File.open(file) do |file|
-      maze[:name] = file.readline.strip
-      maze[:wall] = file.readline.strip
-      maze[:start_x], maze[:start_y], maze[:stop_x], maze[:stop_y] = file.readline.strip.split(/,/)
-      file.each_line do |line|
-        matrix << line.gsub("\n", "\r\n").split(//)
+      File.open(file) do |file|
+        maze[:name] = file.readline.strip
+        maze[:wall] = file.readline.strip
+        maze[:start_x], maze[:start_y], maze[:stop_x], maze[:stop_y] = file.readline.strip.split(/,/)
+        file.each_line do |line|
+          matrix << line.gsub("\n", "\r\n").split(//)
+        end
       end
-    end
-    maze[:maze] = matrix.join
-#    maze[:maze] = matrix
+      maze[:maze] = matrix.join
     maze
   end
 
@@ -63,7 +62,6 @@ module BfsMaze
       start_y = @maze[:start_y]
       stop_x = @maze[:stop_x]
       stop_y = @maze[:stop_y]
-
       if @maze[:matrix][start_y][start_x] == @maze[:wall] || @maze[:matrix][stop_y][stop_x] == @maze[:wall]
         raise "Start or Goal cannot be a wall!!!"
       end
