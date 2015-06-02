@@ -1,0 +1,10 @@
+<div class="flass_message">
+  <% flash.each do |name, msg| %>
+      <% if msg.is_a?(String) %>
+          <div data-alert class="alert-box <%= name %>">
+            <%= msg %>
+            <button href="#" class="close">&times;</button>
+          </div>
+      <% end %>
+  <% end %>
+</div>

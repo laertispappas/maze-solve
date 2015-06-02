@@ -1,50 +1,143 @@
-<%= form_for(@maze, html: { multipart: true }) do |f| %>
-  <% if @maze.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@maze.errors.count, "error") %> prohibited this maze from being saved:</h2>
-      <ul>
-      <% @maze.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
+
+<%= form_for @maze, html: {multipart: true} do |f| %>
+    <div class="row">
+      <div class="small-12 medium-4 large-4 columns">
+        <h3>Upload a maze</h3>
+        <%= f.label :maze_file %>
+        <%= f.file_field :maze_file, accept: 'text/csv' %>
+      </div>
+      <div class="small-12 medium-4 large-4 columns pull-4">
+        <a href="#" data-reveal-id="mazeFormatModal" class="button tiny alert">Show maze format</a>
+      </div>
     </div>
-  <% end %>
-
-    <h3>Upload a maze</h3>
-    <%= f.label :maze_file %>
-    <%= f.file_field :maze_file, accept: 'text/csv' %>
-
-
-<h3>Or create a maze</h3>
-  <div class="field">
-    <%= f.label :name %><br>
-    <%= f.text_field :name, required: true %>
-  </div>
-  <div class="field">
-    <%= f.label :maze %><br>
-    <%= f.text_area :maze, cols: 20, rows: 10, hint: 'pappas', required: true %>
-  </div>
-  <div class="field">
-    <%= f.label :start_x %><br>
-    <%= f.number_field :start_x, required: true %>
-  </div>
-  <div class="field">
-    <%= f.label :start_y %><br>
-    <%= f.number_field :start_y, required: true %>
-  </div>
-  <div class="field">
-    <%= f.label :stop_x %><br>
-    <%= f.number_field :stop_x, required: true %>
-  </div>
-  <div class="field">
-    <%= f.label :stop_y %><br>
-    <%= f.number_field :stop_y, required: true %>
-  </div>
-  <div class="field">
-    <%= f.label :wall %><br>
-    <%= f.text_field :wall, required: true %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+    <div class="row">
+      <div class="small-12 columns ">
+        <div class="actions">
+          <%= f.submit class: 'button tiny' %>
+        </div>
+      </div>
+    </div>
 <% end %>
+
+<%= form_for(@maze, html: { multipart: true }) do |f| %>
+    <div class="row">
+      <div class="small-12 columns">
+        <% if @maze.errors.any? %>
+            <div id="error_explanation">
+              <h2><%= pluralize(@maze.errors.count, "error") %> prohibited this maze from being saved:</h2>
+              <ul>
+                <% @maze.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+        <% end %>
+      </div>
+    </div>
+    <hr>
+    <h3>Or create a maze</h3>
+    <div class="row">
+      <div class="small-12 medium-4 large-4 columns">
+          <%= f.label :name %>
+          <%= f.text_field :name, required: true %>
+      </div>
+      <div class="small-12 medium-4 large-4 columns">
+        <%= f.label :start_x %>
+        <%= f.number_field :start_x, required: true %>
+      </div>
+      <div class="small-12 medium-4 large-4 columns">
+        <%= f.label :start_y %>
+        <%= f.number_field :start_y, required: true %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 medium-4 large-4 columns">
+        <%= f.label :wall %>
+        <%= f.text_field :wall, required: true %>
+      </div>
+      <div class="small-12 medium-4 large-4 columns">
+        <%= f.label :stop_x %>
+        <%= f.number_field :stop_x, required: true %>
+      </div>
+      <div class="small-12 medium-4 large-4 columns">
+        <%= f.label :stop_y %>
+        <%= f.number_field :stop_y, required: true %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 medium-2 large-2 columns">
+        <div class="field">
+          <%= f.label :free_step %>
+          <%= f.text_field :free_step, required: true %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 medium-6 large-6 push-3 columns">
+        <div class="field">
+          <%= f.label :maze %>
+          <%= f.text_area :maze, cols: 20, rows: 10, required: true %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 medium-6 large-6 push-3 columns ">
+        <div class="actions">
+          <%= f.submit class: 'button tiny' %>
+        </div>
+      </div>
+    </div>
+<% end %>
+
+
+<!-- Reveal Modals begin -->
+<div id="mazeFormatModal" class="reveal-modal" data-reveal aria-labelledby="mazeFormat" aria-hidden="true" role="dialog">
+  <h2 id="mazeFormat">Maze format</h2>
+  <p>Text format should be: </p>
+  <p>
+    <pre class="panel">
+        Name of maze
+        wall character
+        start_x, start_y, stop_x, stop_y
+        maze data here..
+    </pre>
+  </p>
+  For example below is a maze called MyFirstMaze with walls represented with # character start at 1,1 stop(Goal) is at 4,8
+  and after we have th maze representation
+  <p>
+      <pre class="panel">
+          MyFirstMaze
+          #
+          1,1,4,8
+          # ############
+          # ############
+          #  ###########
+          ##  ##########
+          ###  #########
+          ##### ########
+          ####  ########
+          #### #########
+          #### #########
+          #### #########
+      </pre>
+  </p>
+  <p>You can upload a maze file containing the above format or create a maze with the form provided</p>
+  <h3>Maze example 2: Representing maze with binary values:</h3>
+  <p>If 0 is wall you could have</p>
+  <pre class="panel">
+    MyIntMaze
+    0
+    0,0,5,5
+    0111100000
+    0001100011
+    0111111111
+    0011111111
+    0000111111
+    1100000001
+    1100001001
+    1111000011
+  </pre>
+  <p class="alert" style="color: red">MAze algorithm only cares for wall character. all other characters are treated as free steps</p>
+  <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<!-- Reveal Modals end -->

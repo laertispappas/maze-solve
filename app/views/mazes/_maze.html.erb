@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="small-12 columns">
+    <h3>Listing Mazes</h3>
+        <ul class="pricing-table">
+          <li class="title"><%= link_to maze.name, maze_path(maze) %></li>
+          <li class="price">
+            <%= maze.maze %>
+          </li>
+          <li class="description">Start: <%= maze.start_x %>, <%= maze.start_y %></li>
+          <li class="description">Stop: <%= maze.stop_x %>, <%= maze.stop_y %></li>
+          <li class="bullet-item">Wall: <%= maze.wall %></li>
+          <li class="bullet-item">Free step: <%= maze.free_step %></li>
+          <li class="cta-button">
+            <%= link_to_unless_current 'Show', maze %>
+            <%= link_to_unless_current 'Edit', edit_maze_path(maze) %>
+            <%= link_to 'Destroy', maze, method: :delete, data: { confirm: 'Are you sure?' } %>
+          </li>
+          <li class="cta-button">
+            <%= link_to 'Solve', solve_maze_path(maze), class: 'button tiny' %>
+          </li>
+        </ul>
+  </div>
+</div>

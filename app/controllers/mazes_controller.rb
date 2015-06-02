@@ -6,7 +6,7 @@ class MazesController < ApplicationController
     @maze_solver.check_for_error
     @maze_solver.solve_maze
   rescue
-    flash[:alert] = "Start point or goal point must not be on a wall"
+    flash[:alert] = "Start point or goal point must not be on a wall or outside maze"
     redirect_to mazes_url
   end
 
@@ -34,15 +34,29 @@ class MazesController < ApplicationController
   # POST /mazes
   # POST /mazes.json
   def create
-    @maze = Maze.new(maze_params)
-
-    respond_to do |format|
-      if @maze.save
-        format.html { redirect_to @maze, notice: 'Maze was successfully created.' }
-        format.json { render :show, status: :created, location: @maze }
-      else
-        format.html { render :new }
-        format.json { render json: @maze.errors, status: :unprocessable_entity }
+    if params[:maze][:maze_file].present?
+      file = params[:maze][:maze_file]
+      maze_hash = BfsMaze.parse_file(file.path)
+      respond_to do |format|
+        @maze = Maze.new(maze_hash)
+        if @maze.save(maze_hash)
+          format.html { redirect_to @maze, notice: 'Maze was successfully uploaded.' }
+          format.json { render :show, status: :ok, location: @maze }
+        else
+          format.html { render :new }
+          format.json { render json: @maze.errors, status: :unprocessable_entity }
+        end
+      end
+    else
+      @maze = Maze.new(maze_params)
+      respond_to do |format|
+        if @maze.save
+          format.html { redirect_to @maze, notice: 'Maze was successfully created.' }
+          format.json { render :show, status: :ok, location: @maze }
+        else
+          format.html { render :edit }
+          format.json { render json: @maze.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -94,7 +108,7 @@ class MazesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def maze_params
-      params.require(:maze).permit(:name, :maze, :start_x, :start_y, :stop_x, :stop_y, :wall, :free_step, :maze_file, :input_type_id)
+      params.require(:maze).permit(:name, :maze, :start_x, :start_y, :stop_x, :stop_y, :wall, :free_step, :maze_file)
     end
 
 end

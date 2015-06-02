@@ -13,8 +13,8 @@ module BfsMaze
 
   def self.read_text(text_maze)
     matrix = []
-    text_maze.each_line do |line|
-      matrix << line.chomp.split(//)
+    text_maze.split("\r\n").each do |line|
+      matrix << line.split(//)
     end
     matrix # 2D array [['#', '#','#', '#','#', '#'],['#', '#','S','#', '#''#', '#']]...
   end
@@ -24,14 +24,15 @@ module BfsMaze
     matrix = []
 
     File.open(file) do |file|
-      maze[:name] = file.readline
-      maze[:wall] = file.readline
-      maze[:start_x], maze[:start_y], maze[:stop_x], maze[:stop_y] = file.readline.split(/,/)
+      maze[:name] = file.readline.strip
+      maze[:wall] = file.readline.strip
+      maze[:start_x], maze[:start_y], maze[:stop_x], maze[:stop_y] = file.readline.strip.split(/,/)
       file.each_line do |line|
-        matrix << line.split(//)
+        matrix << line.gsub("\n", "\r\n").split(//)
       end
     end
-    maze[:maze] = matrix.join.gsub(/,/, "")
+    maze[:maze] = matrix.join
+#    maze[:maze] = matrix
     maze
   end
 
@@ -42,7 +43,7 @@ module BfsMaze
   class Room < Struct.new(:x, :y, :parent)
   end
 
-  # true if solved
+  # found =  true if solved
   class Status < Struct.new(:found)
   end
 
@@ -59,8 +60,8 @@ module BfsMaze
       @maze[:stop_x] = maze.stop_x
       @maze[:stop_y] = maze.stop_y
       @maze[:wall] = maze.wall
+      @maze[:free_step] = maze.free_step
 
-      @show_progress = false
       @status = Status.new(false)
       @maze[:path] = Room.new(nil, nil, nil)              # Stack Get the path found from Goad room to Start room
     end
@@ -94,6 +95,7 @@ module BfsMaze
       room = Room.new(@maze[:start_x], @maze[:start_y], nil)
       queue = Queue.new
       queue << room
+
       while !queue.empty? && !exit_found
         room = queue.pop
         x = room.x
@@ -102,7 +104,6 @@ module BfsMaze
           exit_found = true
         else
           matrix[y][x] = '*'  # Mark path as visited
-          print if @show_progress
           queue << Room.new(x+1,y,room) if open_room(x+1,y,matrix)
           queue << Room.new(x-1,y,room) if open_room(x-1,y,matrix)
           queue << Room.new(x,y+1,room) if open_room(x,y+1,matrix)
@@ -111,13 +112,13 @@ module BfsMaze
       end
 
       # Clear all pathway markers and keep only whitespaces
-      clear_matrix
+#      clear_matrix
       if exit_found
         @status.found = true
         @maze[:path] = room
         # Repaint solution pathway with markers
 
-#        matrix[room.y][room.x] = '>'
+        matrix[room.y][room.x] = '>'
         while room.parent
           room = room.parent
           matrix[room.y][room.x] = '-'
@@ -136,13 +137,12 @@ module BfsMaze
           room = room.parent
         end
       end
-
     end
 
     private
     def open_room(x,y,matrix)
-      return false if (x<0 || x>matrix[0].size-1 || y<0 || y>matrix.size-1)
-      return matrix[y][x] == ' '
+      return false if (x < 0 || x > matrix.max.size - 1 || y < 0 || y > matrix.size-1)
+      return matrix[y][x] != @maze[:wall]
     end
 
     def clear_matrix

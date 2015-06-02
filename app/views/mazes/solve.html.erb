@@ -51,9 +51,9 @@
             var g_stop_x = "<%= @maze.stop_x %>";
             var g_stop_y = "<%= @maze.stop_y %>";
 
-            var maze_width = "<%= @maze_solver.maze[:matrix][0].size %>";
-            var maze_height = "<%= @maze_solver.maze[:matrix].size %>";
 
+            var maze_width = "<%= @maze.max_width %>";
+            var maze_height = "<%= @maze.max_height %>";
             var canvas_width = c.width;
             var canvas_height = c.height;
             var room_w = 25;
@@ -73,19 +73,9 @@
             var start_y = 0;
             <% @matrix.each_index do |row| %>
                 <% @matrix[row].each do |col| %>
-    //                console.log("<%= col %>");
                     <% if col == @maze.wall %>
                         // draw wall
                         ctx.fillRect(start_x, start_y, room_w, room_h);
-                    <% elsif col == 'S' %>
-                        // draw S
-                    <% elsif col == 'G' %>
-                        // draw G
-                    <% elsif col == ' ' || col == '.' || col == '-' %>
-
-                    <% else %>
-                        // error read input that was neither wall neither free_step
-                        alert("Read input error unknown format");
                     <% end %>
                     start_x += room_w;
                 <% end %>
