@@ -1,0 +1,119 @@
+<div class="maze-original">
+  <div class="maze">Maze to solve:
+            <pre>
+                <% @matrix[@maze.start_y][@maze.start_x] = 'S' %>
+                <% @matrix[@maze.stop_y][@maze.stop_x] = 'G' %>
+                <% @matrix.each_index do |index| %>
+                    <%= @matrix[index].join %>
+                <% end %>
+              <% @matrix[@maze.start_y][@maze.start_x] = '-' %>
+              <% @matrix[@maze.stop_y][@maze.stop_x] = '-' %>
+            </pre>
+    </div>
+  </div>
+<div class="">
+    <div class="maze">
+      <% if @maze_solver.status.found %>
+        <div class="maze">
+          <p>
+            Solved maze
+          </p>
+          <canvas id="myCanvas" width="640" height="450" style="border:1px solid #000000;">
+            No canvas supported
+          </canvas>
+            <pre>
+                <% @matrix[@maze.start_y][@maze.start_x] = 'S' %>
+                <% @matrix[@maze.stop_y][@maze.stop_x] = 'G' %>
+                <% @matrix.each_index do |index| %>
+                    <%= @matrix[index].join %>
+                <% end %>
+              <% @matrix[@maze.start_y][@maze.start_x] = '-' %>
+              <% @matrix[@maze.stop_y][@maze.stop_x] = '-' %>
+            </pre>
+            <h3>Path: </h3>
+            <%= @maze_solver.maze[:path]  %>
+      <% else %>
+          <h3>Maze could not be solved</h3>
+      <% end %>
+      </div>
+    </div>
+</div>
+
+<% if @maze_solver.status.found %>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            // fill
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+
+            var s_start_x = "<%= @maze.start_x %>";
+            var s_start_y = "<%= @maze.start_y %>";
+            var g_stop_x = "<%= @maze.stop_x %>";
+            var g_stop_y = "<%= @maze.stop_y %>";
+
+            var maze_width = "<%= @maze_solver.maze[:matrix][0].size %>";
+            var maze_height = "<%= @maze_solver.maze[:matrix].size %>";
+
+            var canvas_width = c.width;
+            var canvas_height = c.height;
+            var room_w = 25;
+            var room_h = 25;
+
+            // make canvas width and height dynamic
+            c.width = maze_width * room_w;
+            c.height=maze_height * room_h;
+
+            // fill maze background with a light grey color
+            ctx.fillStyle = "#eee";
+            ctx.fillRect(0,0,maze_width*room_w,maze_height*room_h);
+            ctx.fillStyle = "#000";
+
+            ctx.fillStyle = "#000";
+            var start_x = 0;
+            var start_y = 0;
+            <% @matrix.each_index do |row| %>
+                <% @matrix[row].each do |col| %>
+    //                console.log("<%= col %>");
+                    <% if col == @maze.wall %>
+                        // draw wall
+                        ctx.fillRect(start_x, start_y, room_w, room_h);
+                    <% elsif col == 'S' %>
+                        // draw S
+                    <% elsif col == 'G' %>
+                        // draw G
+                    <% elsif col == ' ' || col == '.' || col == '-' %>
+
+                    <% else %>
+                        // error read input that was neither wall neither free_step
+                        alert("Read input error unknown format");
+                    <% end %>
+                    start_x += room_w;
+                <% end %>
+                start_x = 0;
+                start_y += room_h;
+            <% end %>
+
+            // print path with green color
+            ctx.fillStyle = "#00ff00";
+            <% @maze_solver.yield_path do |x, y| %>
+                start_x = <%= x %>;
+                start_y = '<%= y %>';
+                ctx.fillRect(start_x*room_w, start_y*room_h, room_w, room_h);
+            <% end %>
+
+            // fill start with blue color
+            ctx.fillStyle = "#0000ff";
+            ctx.fillRect(s_start_x*room_w, s_start_y*room_h, room_w, room_h);
+
+            // fill goal with red color
+            ctx.fillStyle = "#ff0000";
+            ctx.fillRect(g_stop_x * room_w, g_stop_y * room_h, room_w, room_h);
+
+            // draw S, G
+            ctx.fillStyle = "#000000";
+            ctx.font = "15px Georgia";
+            ctx.fillText('S', s_start_x * room_w + 8, s_start_y * room_h + 19 );
+            ctx.fillText('G', g_stop_x*room_w + 8, g_stop_y * room_h + 19);
+        });
+    </script>
+<% end %>

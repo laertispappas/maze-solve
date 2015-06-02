@@ -1,0 +1,50 @@
+<%= form_for(@maze, html: { multipart: true }) do |f| %>
+  <% if @maze.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@maze.errors.count, "error") %> prohibited this maze from being saved:</h2>
+      <ul>
+      <% @maze.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+    <h3>Upload a maze</h3>
+    <%= f.label :maze_file %>
+    <%= f.file_field :maze_file, accept: 'text/csv' %>
+
+
+<h3>Or create a maze</h3>
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name, required: true %>
+  </div>
+  <div class="field">
+    <%= f.label :maze %><br>
+    <%= f.text_area :maze, cols: 20, rows: 10, hint: 'pappas', required: true %>
+  </div>
+  <div class="field">
+    <%= f.label :start_x %><br>
+    <%= f.number_field :start_x, required: true %>
+  </div>
+  <div class="field">
+    <%= f.label :start_y %><br>
+    <%= f.number_field :start_y, required: true %>
+  </div>
+  <div class="field">
+    <%= f.label :stop_x %><br>
+    <%= f.number_field :stop_x, required: true %>
+  </div>
+  <div class="field">
+    <%= f.label :stop_y %><br>
+    <%= f.number_field :stop_y, required: true %>
+  </div>
+  <div class="field">
+    <%= f.label :wall %><br>
+    <%= f.text_field :wall, required: true %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

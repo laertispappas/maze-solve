@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  maze: MyText
+  start_x: 1
+  start_y: 1
+  stop_x: 1
+  stop_y: 1
+  wall: MyString
+  free_step: MyString
+
+two:
+  name: MyString
+  maze: MyText
+  start_x: 1
+  start_y: 1
+  stop_x: 1
+  stop_y: 1
+  wall: MyString
+  free_step: MyString
