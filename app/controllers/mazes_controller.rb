@@ -70,7 +70,6 @@ rescue
     if params[:maze][:maze_file].present?
       file = params[:maze][:maze_file]
       maze_hash = BfsMaze.parse_file(file.path)
-      p maze_hash
       respond_to do |format|
         if @maze.update(maze_hash)
           format.html { redirect_to @maze, notice: 'Maze was successfully updated.' }
