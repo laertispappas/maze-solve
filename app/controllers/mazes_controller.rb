@@ -59,8 +59,7 @@ rescue
         end
       end
     end
-
-  rescue
+  rescue EOFError
     flash[:alert] = "Error creating maze check your file input format!!!"
     redirect_to new_maze_url
   end
@@ -92,6 +91,9 @@ rescue
         end
       end
     end
+  rescue EOFError
+    flash[:alert] = "Error creating maze check your file input format!!!"
+    redirect_to new_maze_url
   end
 
   # DELETE /mazes/1

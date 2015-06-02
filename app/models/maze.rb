@@ -15,6 +15,8 @@ class Maze < ActiveRecord::Base
   validate :accept_one_char_for_wall
   validate :do_not_accept_asterisk
   validate :do_not_accept_asterisk_in_maze
+  validate :start_stop_in_maze
+  validate :start_stop_not_a_wall
 
   default_scope { order("created_at DESC") }
 
@@ -45,5 +47,22 @@ class Maze < ActiveRecord::Base
     end
   end
 
+  def start_stop_not_a_wall
+    m = self.maze
+    matrix = []
+    m.split("\r\n").each do |line|
+      matrix << line.split(//)
+    end
+    if matrix[self.start_y][self.start_x] == self.wall || matrix[self.stop_y][self.stop_x] == self.wall
+      errors.add("Start or stop position is a wall", "")
+    end
+  end
 
+  def start_stop_in_maze
+    width = self.max_width
+    height = self.max_height
+    if !self.start_x.in?(0..width) || !self.stop_x.in?(0..height) || !self.stop_x.in?(0..width) || !self.stop_y.in?(0..height)
+      errors.add("Start or stop position",  "is not in maze")
+    end
+  end
 end
