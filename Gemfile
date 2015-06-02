@@ -15,6 +15,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem "paperclip", "~> 4.2"
 gem 'pg', group: :production
 gem 'rails_12factor', group: :production
+gem 'foundation-rails'
+
+gem 'simple_form'
 
 # gem 'bcrypt', '~> 3.1.7'
 
