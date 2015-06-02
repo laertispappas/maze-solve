@@ -1,12 +1,6 @@
 module BfsMaze
-  # Example:
-  # require './maze'
-  # maze = Maze.load('./mymaze.txt')
-  # maze_solver = Maze::Solver.new(maze)
-  # maze_solver.solve
 
   # read from file and return a 2d matrix
-
   def self.read_activerecord_text(model_maze)
     return read_text(model_maze.maze)
   end
@@ -37,9 +31,8 @@ module BfsMaze
   end
 
 
-  # Room to hold an x,y square during maze traversal, with
-  # a link back to it's parent.  Links are used after the exit
-  # is found to trace exit back to entrance.
+  # Room to hold x,y during maze traversal, with
+  # a link back to it's parent. Used as linked list to trace back to its parent so we can find the path from goal to start
   class Room < Struct.new(:x, :y, :parent)
   end
 
@@ -60,10 +53,9 @@ module BfsMaze
       @maze[:stop_x] = maze.stop_x
       @maze[:stop_y] = maze.stop_y
       @maze[:wall] = maze.wall
-      @maze[:free_step] = maze.free_step
 
       @status = Status.new(false)
-      @maze[:path] = Room.new(nil, nil, nil)              # Stack Get the path found from Goad room to Start room
+      @maze[:path] = Room.new(nil, nil, nil) # Stack Get the path found from Goal to Start
     end
 
     def check_for_error
@@ -104,29 +96,18 @@ module BfsMaze
           exit_found = true
         else
           matrix[y][x] = '*'  # Mark path as visited
-          queue << Room.new(x+1,y,room) if open_room(x+1,y,matrix)
-          queue << Room.new(x-1,y,room) if open_room(x-1,y,matrix)
-          queue << Room.new(x,y+1,room) if open_room(x,y+1,matrix)
-          queue << Room.new(x,y-1,room) if open_room(x,y-1,matrix)
+
+          queue << Room.new(x+1,y,room) if open_room(x+1,y,matrix) and !visited(x+1, y, matrix)
+          queue << Room.new(x-1,y,room) if open_room(x-1,y,matrix) and !visited(x-1,y,matrix)
+          queue << Room.new(x,y+1,room) if open_room(x,y+1,matrix) and !visited(x, y+1, matrix)
+          queue << Room.new(x,y-1,room) if open_room(x,y-1,matrix) and !visited(x, y-1, matrix)
         end
       end
 
-      # Clear all pathway markers and keep only whitespaces
-#      clear_matrix
       if exit_found
         @status.found = true
         @maze[:path] = room
-        # Repaint solution pathway with markers
-
-        matrix[room.y][room.x] = '>'
-        while room.parent
-          room = room.parent
-          matrix[room.y][room.x] = '-'
-        end
-        puts "Maze solved:\n\n"
-        print
       else
-        puts 'No exit found'
         @status.found = false
       end
 
@@ -137,6 +118,14 @@ module BfsMaze
           room = room.parent
         end
       end
+
+      def path_array
+        path = []
+        yield_path do |x, y|
+          path << [x,y]
+        end
+      path.reverse
+      end
     end
 
     private
@@ -145,10 +134,9 @@ module BfsMaze
       return matrix[y][x] != @maze[:wall]
     end
 
-    def clear_matrix
-      @maze[:matrix].each_index do |idx|
-        @maze[:matrix][idx] = @maze[:matrix][idx].join.gsub(/[^#|\s]/i,' ').split(//)
-#        puts @maze[:matrix][idx]
+    def visited(x, y, matrix)
+      if open_room(x,y, matrix)
+        return matrix[y][x] == '*'
       end
     end
   end

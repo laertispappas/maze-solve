@@ -3,13 +3,15 @@
     <h3>Listing Mazes</h3>
         <ul class="pricing-table">
           <li class="title"><%= link_to maze.name, maze_path(maze) %></li>
-          <li class="price">
-            <%= maze.maze %>
-          </li>
+            <li class="price">
+              <canvas id="mazeCanvas-<%= maze.id %>" width="640" height="450" style="border:1px solid #000000;">
+                No canvas supported
+                  <%= maze.maze %>
+              </canvas>
+            </li>
           <li class="description">Start: <%= maze.start_x %>, <%= maze.start_y %></li>
           <li class="description">Stop: <%= maze.stop_x %>, <%= maze.stop_y %></li>
           <li class="bullet-item">Wall: <%= maze.wall %></li>
-          <li class="bullet-item">Free step: <%= maze.free_step %></li>
           <li class="cta-button">
             <%= link_to_unless_current 'Show', maze %>
             <%= link_to_unless_current 'Edit', edit_maze_path(maze) %>
@@ -21,3 +23,64 @@
         </ul>
   </div>
 </div>
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+        // fill
+        var c = document.getElementById("mazeCanvas-<%= maze.id %>");
+        var ctx = c.getContext("2d");
+
+        var s_start_x = "<%= maze.start_x %>";
+        var s_start_y = "<%= maze.start_y %>";
+        var g_stop_x = "<%= maze.stop_x %>";
+        var g_stop_y = "<%= maze.stop_y %>";
+
+        var maze_width = "<%= maze.max_width %>";
+        var maze_height = "<%= maze.max_height %>";
+        var canvas_width = c.width;
+        var canvas_height = c.height;
+        var room_w = 12;
+        var room_h = 12;
+
+        // make canvas width and height dynamic
+        c.width = maze_width * room_w;
+        c.height=maze_height * room_h;
+
+        // fill maze background with a light grey color
+        ctx.fillStyle = "#eee";
+        ctx.fillRect(0,0,maze_width*room_w,maze_height*room_h);
+        ctx.fillStyle = "#000";
+
+        ctx.fillStyle = "#000";
+        var start_x = 0;
+        var start_y = 0;
+
+        <% matrix = BfsMaze.read_text(maze.maze) %>
+
+        <% matrix.each_index do |row| %>
+            <% matrix[row].each do |col| %>
+                <% if col == maze.wall %>
+                    // draw wall
+                    ctx.fillRect(start_x, start_y, room_w, room_h);
+                <% end %>
+                start_x += room_w;
+            <% end %>
+            start_x = 0;
+            start_y += room_h;
+        <% end %>
+
+        // fill start with blue color
+        ctx.fillStyle = "#0000ff";
+        ctx.fillRect(s_start_x*room_w, s_start_y*room_h, room_w, room_h);
+
+        // fill goal with red color
+        ctx.fillStyle = "#ff0000";
+        ctx.fillRect(g_stop_x * room_w, g_stop_y * room_h, room_w, room_h);
+
+        // draw text S, G
+        ctx.fillStyle = "#000000";
+        ctx.font = "12px Georgia";
+        ctx.fillText('S', s_start_x * room_w + 4, s_start_y * room_h + 10 );
+        ctx.fillText('G', g_stop_x*room_w + 4 , g_stop_y * room_h + 10);
+    });
+</script>

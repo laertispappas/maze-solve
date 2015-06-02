@@ -3,13 +3,13 @@ class MazesController < ApplicationController
   def solve
     @matrix = BfsMaze.read_text(@maze.maze)
     @maze_solver = BfsMaze::BFSSolver.new(@matrix, @maze)
-    @maze_solver.check_for_error
+#    @maze_solver.check_for_error
     @maze_solver.solve_maze
-  rescue
-    flash[:alert] = "Start point or goal point must not be on a wall or outside maze"
-    redirect_to mazes_url
+    @path = @maze_solver.path_array
+#rescue
+#    flash[:alert] = "Start or Goal cannot be a wall or outside maze!!!"
+#    redirect_to mazes_url
   end
-
 
   # GET /mazes
   # GET /mazes.json
